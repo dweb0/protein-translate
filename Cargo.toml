@@ -11,6 +11,7 @@ keywords = ["bioinformatics", "translate", "dna", "rna", "protein"]
 categories = ["algorithms", "science"]
 license = "MIT/Apache-2.0"
 edition = "2018"
+exclude = ["/.travis.yml", "/benches/*", "/tests/*"]
 
 [badges]
 travis-ci = { repository = "dweb0/protein-translate" }
