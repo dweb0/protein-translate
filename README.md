@@ -10,10 +10,8 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-protein-translate = { git = "https://github.com/dweb0/protein-translate" }
+protein-translate = "0.1.0"
 ```
-
-Will add this to crates.io soon.
 
 ## Example
 

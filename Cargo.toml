@@ -2,6 +2,7 @@
 name = "protein-translate"
 version = "0.1.0"
 authors = ["dweb0"]
+documentation = "https://docs.rs/protein-translate/"
 description = "Translate nucleotide sequence to protein."
 homepage = "https://github.com/dweb0/protein-translate"
 repository = "https://github.com/dweb0/protein-translate"
