@@ -1,6 +1,6 @@
 [package]
 name = "protein-translate"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["dweb0"]
 documentation = "https://docs.rs/protein-translate/"
 description = "Translate nucleotide sequence to protein."
