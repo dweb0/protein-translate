@@ -122,14 +122,15 @@ mod using_lazy_static {
 
     pub fn translate(seq: &str) -> String {
 
-        let len = seq.len();
-        let bytes = seq.as_bytes();
-        let mut peptide = String::with_capacity(len);
-        
-        for i in (0..len - 2 - (len % 3)).step_by(3) {
-            let amino_acid = AA_TABLE.get(&bytes[i..i+3]).unwrap_or(&'X');
+        let mut peptide = String::with_capacity(seq.len() / 3);
+        for chunk in seq.as_bytes().chunks(3) {
+            if chunk.len() < 3 {
+                break;
+            }
+            let amino_acid = AA_TABLE.get(chunk).unwrap_or(&'X');
             peptide.push(*amino_acid);
         }
+
         peptide
     }
 }
@@ -165,14 +166,15 @@ mod using_match {
 
     pub fn translate(seq: &str) -> String {
 
-        let len = seq.len();
-        let bytes = seq.as_bytes();
-        let mut peptide = String::with_capacity(len);
-        
-        for i in (0..len - 2 - (len % 3)).step_by(3) {
-            let amino_acid = triplet_to_char(&bytes[i..i+3]);
+        let mut peptide = String::with_capacity(seq.len() / 3);
+        for chunk in seq.as_bytes().chunks(3) {
+            if chunk.len() < 3 {
+                break;
+            }
+            let amino_acid = triplet_to_char(chunk);
             peptide.push(amino_acid);
         }
+
         peptide
     }
 }
@@ -286,12 +288,12 @@ mod using_phf_map {
 
 
     pub fn translate(seq: &str) -> String {
-        let len = seq.len();
-        let bytes = seq.as_bytes();
-        let mut peptide = String::with_capacity(len);
-        
-        for i in (0..len - 2 - (len % 3)).step_by(3) {
-            let amino_acid = AA_TABLE.get(&bytes[i..i+3]).unwrap_or(&'X');
+        let mut peptide = String::with_capacity(seq.len() / 3);
+        for chunk in seq.as_bytes().chunks(3) {
+            if chunk.len() < 3 {
+                break;
+            }
+            let amino_acid = AA_TABLE.get(chunk).unwrap_or(&'X');
             peptide.push(*amino_acid);
         }
         peptide
