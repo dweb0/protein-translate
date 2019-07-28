@@ -1,7 +1,6 @@
 use protein_translate::translate;
 
 #[test]
-
 fn validate() {
 
     let test_data = include_bytes!("test_data.csv");
