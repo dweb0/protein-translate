@@ -46,14 +46,14 @@
 pub fn translate(seq: &str) -> String {
     let mut peptide = String::with_capacity(seq.len() / 3);
 
-    for chunk in seq.as_bytes().chunks(3) {
-        if chunk.len() < 3 {
+    for triplet in seq.as_bytes().chunks(3) {
+        if triplet.len() < 3 {
             break;
         }
 
-        let c1 = ASCII_TO_INDEX[chunk[0] as usize];
-        let c2 = ASCII_TO_INDEX[chunk[1] as usize];
-        let c3 = ASCII_TO_INDEX[chunk[2] as usize];
+        let c1 = ASCII_TO_INDEX[triplet[0] as usize];
+        let c2 = ASCII_TO_INDEX[triplet[1] as usize];
+        let c3 = ASCII_TO_INDEX[triplet[2] as usize];
 
         let amino_acid = if c1 == 4 || c2 == 4 || c3 == 4 {
             'X'
