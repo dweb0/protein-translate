@@ -57,6 +57,7 @@ If you have a better implementation feel free to submit a merge request!
 ## Todo
 * Add other Codon tables (e.g. Vertebrate Mitochondrial, Yeast Mitochondrial, Mold Mitochondrial, etc.)
 * Add support for ambiguous nucleotides (right now, only supports A, U, T, C, G)
+* Benchmark using [fnv](https://github.com/servo/rust-fnv) (should be a lot faster for small hashmaps).
 
 ## Tests
 
