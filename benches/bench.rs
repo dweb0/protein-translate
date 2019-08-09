@@ -416,12 +416,19 @@ mod using_phf_map {
 
 
 // 100,000 base pair sequence
-static TEST_SEQ: &'static str = include_str!("test_seq.txt");
+static TEST_SEQ: &'static str = include_str!("big.txt");
 
 fn bench_current(c: &mut Criterion) {
 
     c.bench_function("current implementation", |b| {
         b.iter(|| protein_translate::translate(black_box(TEST_SEQ)))
+    });
+}
+
+fn bench_parallel(c: &mut Criterion) {
+
+    c.bench_function("parallel implementation", |b| {
+        b.iter(|| protein_translate::par_translate(black_box(TEST_SEQ)))
     });
 }
 
@@ -451,9 +458,10 @@ fn bench_phf_map(c: &mut Criterion) {
 
 criterion_group!(
     benches,
-    // bench_current,
+    bench_current,
+    bench_parallel
     // bench_hashmap,
-    bench_fnv,
+    //bench_fnv,
     // bench_match,
     // bench_phf_map
 );

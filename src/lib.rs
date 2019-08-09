@@ -47,7 +47,6 @@ pub fn translate(seq: &str) -> String {
     let mut peptide = String::with_capacity(seq.len() / 3);
 
     for triplet in seq.as_bytes().chunks_exact(3) {
-    
         let c1 = ASCII_TO_INDEX[triplet[0] as usize];
         let c2 = ASCII_TO_INDEX[triplet[1] as usize];
         let c3 = ASCII_TO_INDEX[triplet[2] as usize];
@@ -61,6 +60,29 @@ pub fn translate(seq: &str) -> String {
         peptide.push(amino_acid);
     }
     peptide
+}
+
+#[cfg(feature = "parallel")]
+use rayon::prelude::*;
+#[cfg(feature = "parallel")]
+use rayon::iter::ParallelBridge;
+
+#[cfg(feature = "parallel")]
+pub fn par_translate(seq: &str) -> String {
+    seq.as_bytes()
+        .chunks_exact(3)
+        .par_bridge()
+        .map(|triplet| {
+            let c1 = ASCII_TO_INDEX[triplet[0] as usize];
+            let c2 = ASCII_TO_INDEX[triplet[1] as usize];
+            let c3 = ASCII_TO_INDEX[triplet[2] as usize];
+            if c1 == 4 || c2 == 4 || c3 == 4 {
+                'X'
+            } else {
+                AA_TABLE_CANONICAL[c1][c2][c3]
+            }
+        })
+        .collect()
 }
 
 /// https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
