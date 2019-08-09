@@ -1,4 +1,4 @@
-# `protein-translate`
+# protein-translate
 
 [![Build Status](https://travis-ci.com/dweb0/protein-translate.svg?token=EQz1tk6xqYMBC8vjUmyv&branch=master)](https://travis-ci.com/dweb0/protein-translate)
 [![Cargo](https://img.shields.io/crates/v/protein-translate.svg)](https://crates.io/crates/protein-translate)
