@@ -8,7 +8,7 @@ extern crate criterion;
 use criterion::{Criterion, black_box};
 
 
-mod using_lazy_static {
+mod using_hashmap {
 
     use std::collections::HashMap;
 
@@ -123,10 +123,130 @@ mod using_lazy_static {
     pub fn translate(seq: &str) -> String {
 
         let mut peptide = String::with_capacity(seq.len() / 3);
-        for chunk in seq.as_bytes().chunks(3) {
-            if chunk.len() < 3 {
-                break;
-            }
+        for chunk in seq.as_bytes().chunks_exact(3) {
+            let amino_acid = AA_TABLE.get(chunk).unwrap_or(&'X');
+            peptide.push(*amino_acid);
+        }
+
+        peptide
+    }
+}
+
+mod using_fnv {
+    use fnv::FnvHashMap;
+
+    lazy_static! {
+        static ref AA_TABLE: FnvHashMap<&'static [u8], char> = {
+            let mut m: FnvHashMap<&'static [u8], char> = FnvHashMap::default();
+            m.insert(b"TAA", '*');
+            m.insert(b"TAG", '*');
+            m.insert(b"TGA", '*');
+            m.insert(b"UAA", '*');
+            m.insert(b"UAG", '*');
+            m.insert(b"UGA", '*');
+            m.insert(b"GCA", 'A');
+            m.insert(b"GCC", 'A');
+            m.insert(b"GCG", 'A');
+            m.insert(b"GCT", 'A');
+            m.insert(b"GCU", 'A');
+            m.insert(b"TGC", 'C');
+            m.insert(b"TGT", 'C');
+            m.insert(b"UGC", 'C');
+            m.insert(b"UGU", 'C');
+            m.insert(b"GAC", 'D');
+            m.insert(b"GAT", 'D');
+            m.insert(b"GAU", 'D');
+            m.insert(b"GAA", 'E');
+            m.insert(b"GAG", 'E');
+            m.insert(b"TTC", 'F');
+            m.insert(b"TTT", 'F');
+            m.insert(b"UUC", 'F');
+            m.insert(b"UUU", 'F');
+            m.insert(b"GGA", 'G');
+            m.insert(b"GGC", 'G');
+            m.insert(b"GGG", 'G');
+            m.insert(b"GGT", 'G');
+            m.insert(b"GGU", 'G');
+            m.insert(b"CAC", 'H');
+            m.insert(b"CAT", 'H');
+            m.insert(b"CAU", 'H');
+            m.insert(b"ATA", 'I');
+            m.insert(b"ATC", 'I');
+            m.insert(b"ATT", 'I');
+            m.insert(b"AUA", 'I');
+            m.insert(b"AUC", 'I');
+            m.insert(b"AUU", 'I');
+            m.insert(b"AAA", 'K');
+            m.insert(b"AAG", 'K');
+            m.insert(b"CTA", 'L');
+            m.insert(b"CTC", 'L');
+            m.insert(b"CTG", 'L');
+            m.insert(b"CTT", 'L');
+            m.insert(b"CUA", 'L');
+            m.insert(b"CUC", 'L');
+            m.insert(b"CUG", 'L');
+            m.insert(b"CUU", 'L');
+            m.insert(b"TTA", 'L');
+            m.insert(b"TTG", 'L');
+            m.insert(b"UUA", 'L');
+            m.insert(b"UUG", 'L');
+            m.insert(b"ATG", 'M');
+            m.insert(b"AUG", 'M');
+            m.insert(b"AAC", 'N');
+            m.insert(b"AAT", 'N');
+            m.insert(b"AAU", 'N');
+            m.insert(b"CCA", 'P');
+            m.insert(b"CCC", 'P');
+            m.insert(b"CCG", 'P');
+            m.insert(b"CCT", 'P');
+            m.insert(b"CCU", 'P');
+            m.insert(b"CAA", 'Q');
+            m.insert(b"CAG", 'Q');
+            m.insert(b"AGA", 'R');
+            m.insert(b"AGG", 'R');
+            m.insert(b"CGA", 'R');
+            m.insert(b"CGC", 'R');
+            m.insert(b"CGG", 'R');
+            m.insert(b"CGT", 'R');
+            m.insert(b"CGU", 'R');
+            m.insert(b"AGC", 'S');
+            m.insert(b"AGT", 'S');
+            m.insert(b"AGU", 'S');
+            m.insert(b"TCA", 'S');
+            m.insert(b"TCC", 'S');
+            m.insert(b"TCG", 'S');
+            m.insert(b"TCT", 'S');
+            m.insert(b"UCA", 'S');
+            m.insert(b"UCC", 'S');
+            m.insert(b"UCG", 'S');
+            m.insert(b"UCU", 'S');
+            m.insert(b"ACA", 'T');
+            m.insert(b"ACC", 'T');
+            m.insert(b"ACG", 'T');
+            m.insert(b"ACT", 'T');
+            m.insert(b"ACU", 'T');
+            m.insert(b"GTA", 'V');
+            m.insert(b"GTC", 'V');
+            m.insert(b"GTG", 'V');
+            m.insert(b"GTT", 'V');
+            m.insert(b"GUA", 'V');
+            m.insert(b"GUC", 'V');
+            m.insert(b"GUG", 'V');
+            m.insert(b"GUU", 'V');
+            m.insert(b"TGG", 'W');
+            m.insert(b"UGG", 'W');
+            m.insert(b"UAC", 'Y');
+            m.insert(b"TAC", 'Y');
+            m.insert(b"TAT", 'Y');
+            m.insert(b"UAU", 'Y');
+            m
+        };
+    }
+
+    pub fn translate(seq: &str) -> String {
+
+        let mut peptide = String::with_capacity(seq.len() / 3);
+        for chunk in seq.as_bytes().chunks_exact(3) {
             let amino_acid = AA_TABLE.get(chunk).unwrap_or(&'X');
             peptide.push(*amino_acid);
         }
@@ -167,10 +287,7 @@ mod using_match {
     pub fn translate(seq: &str) -> String {
 
         let mut peptide = String::with_capacity(seq.len() / 3);
-        for chunk in seq.as_bytes().chunks(3) {
-            if chunk.len() < 3 {
-                break;
-            }
+        for chunk in seq.as_bytes().chunks_exact(3) {
             let amino_acid = triplet_to_char(chunk);
             peptide.push(amino_acid);
         }
@@ -289,10 +406,7 @@ mod using_phf_map {
 
     pub fn translate(seq: &str) -> String {
         let mut peptide = String::with_capacity(seq.len() / 3);
-        for chunk in seq.as_bytes().chunks(3) {
-            if chunk.len() < 3 {
-                break;
-            }
+        for chunk in seq.as_bytes().chunks_exact(3) {
             let amino_acid = AA_TABLE.get(chunk).unwrap_or(&'X');
             peptide.push(*amino_acid);
         }
@@ -311,9 +425,15 @@ fn bench_current(c: &mut Criterion) {
     });
 }
 
-fn bench_lazy_static(c: &mut Criterion) {
-    c.bench_function("lazy static", |b| {
-        b.iter(|| using_lazy_static::translate(black_box(TEST_SEQ)))
+fn bench_hashmap(c: &mut Criterion) {
+    c.bench_function("std hashmap", |b| {
+        b.iter(|| using_hashmap::translate(black_box(TEST_SEQ)))
+    });
+}
+
+fn bench_fnv(c: &mut Criterion) {
+    c.bench_function("fnv hashmap", |b| {
+        b.iter(|| using_fnv::translate(black_box(&TEST_SEQ)))
     });
 }
 
@@ -331,9 +451,10 @@ fn bench_phf_map(c: &mut Criterion) {
 
 criterion_group!(
     benches,
-    bench_current,
-    bench_lazy_static,
-    bench_match,
-    bench_phf_map
+    // bench_current,
+    // bench_hashmap,
+    bench_fnv,
+    // bench_match,
+    // bench_phf_map
 );
 criterion_main!(benches);
