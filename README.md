@@ -56,8 +56,7 @@ cargo +nightly bench
 ### Thoughts
 
 * [FNV](https://github.com/servo/rust-fnv) seems to be a great option, but I have chosen to use the current implementation due to being slightly faster and not required any dependencies.
-* There is hardly any benefit to using `translate_unchecked`.
-* There was originally a function called `translate_unchecked` that did not validate each byte for valid ASCII, but since the performance gain was negligible, it was removed
+* There was originally a function called `translate_unchecked` that did not validate each byte for valid ASCII, but since the performance gain was negligible, it was removed.
 
 ## Todo
 * Add other Codon tables (e.g. Vertebrate Mitochondrial, Yeast Mitochondrial, Mold Mitochondrial, etc.)
