@@ -1,7 +1,8 @@
 use protein_translate::translate;
 
 fn main() {
-    let dna = "GTGAGTCGTTGAGTCTGATTGCGTATC";
+    let dna = b"GTGAGTCGTTGAGTCTGATTGCGTATC";
+    
     let protein = translate(dna);
     assert_eq!("VSR*V*LRI", &protein);
 

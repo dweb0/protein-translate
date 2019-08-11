@@ -1,13 +1,18 @@
+/*!
+
+Translate DNA or RNA sequence into protein.
+
+"X" = invalid amino acid  
+"*" = stop codon
+You can find the rest of the table
+[elsewhere](https://en.wikipedia.org/wiki/DNA_codon_table).
+
+*/
+
+#![deny(missing_docs)]
+
 /// Translate DNA or RNA sequence into a peptide.
-///
-/// X = invalid amino acid, * = stop codon.
-/// You can find the rest of the table
-/// [elsewhere](https://en.wikipedia.org/wiki/DNA_codon_table).
-///
-/// Note that no checks are made to see if this is a valid
-/// nucleotide sequence. The sequence must be valid ASCII
-/// characters. E.g. "CUAGUCG😍UAUCGUAGCUAGUC" will panic.
-///
+///  
 /// # Examples
 ///
 /// ```
@@ -16,7 +21,7 @@
 /// # fn main() { dna_example(); rna_example(); shift_reading_frame(); }
 /// fn dna_example() {
 ///     
-///     let dna = "GCTAGTCGTATCGTAGCTAGTC";
+///     let dna = b"GCTAGTCGTATCGTAGCTAGTC";
 ///     let peptide = translate(dna);
 ///     assert_eq!(&peptide, "ASRIVAS");
 ///
@@ -24,7 +29,7 @@
 ///
 /// fn rna_example() {
 ///
-///     let rna = "GCUAGUCGUAUCGUAGCUAGUC";
+///     let rna = b"GCUAGUCGUAUCGUAGCUAGUC";
 ///     let peptide = translate(rna);
 ///     assert_eq!(&peptide, "ASRIVAS");
 /// }
@@ -34,7 +39,7 @@
 ///     // To shift the reading frame, pass in a slice
 ///     // skipping the first 1-2 nucleotides.
 ///
-///     let dna = "GCTAGTCGTATCGTAGCTAGTC";
+///     let dna = b"GCTAGTCGTATCGTAGCTAGTC";
 ///     let peptide_frame2 = translate(&dna[1..]);
 ///     assert_eq!(&peptide_frame2, "LVVS*LV");
 ///
@@ -43,11 +48,17 @@
 ///    
 /// }
 /// ```
-pub fn translate(seq: &str) -> String {
+pub fn translate(seq: &[u8]) -> String {
     let mut peptide = String::with_capacity(seq.len() / 3);
 
-    for triplet in seq.as_bytes().chunks_exact(3) {
-    
+    'outer: for triplet in seq.chunks_exact(3) {
+        for c in triplet {
+            if !c.is_ascii() {
+                peptide.push('X');
+                continue 'outer;
+            }
+        }
+
         let c1 = ASCII_TO_INDEX[triplet[0] as usize];
         let c2 = ASCII_TO_INDEX[triplet[1] as usize];
         let c3 = ASCII_TO_INDEX[triplet[2] as usize];

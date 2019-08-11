@@ -12,7 +12,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-protein-translate = "0.1.2"
+protein-translate = "0.2.0"
 ```
 
 ## Example
@@ -21,7 +21,7 @@ protein-translate = "0.1.2"
 use protein_translate::translate;
 
 fn main() {
-    let dna = "GTGAGTCGTTGAGTCTGATTGCGTATC";
+    let dna = b"GTGAGTCGTTGAGTCTGATTGCGTATC";
     let protein = translate(dna);
     assert_eq!("VSR*V*LRI", &protein);
 
@@ -34,18 +34,18 @@ fn main() {
 
 ## Benchmarks
 
-The current algorithm is inspired by [seqan's](https://github.com/seqan/seqan/blob/master/include/seqan/translation/translation_tables.h) implementation which uses array indexing. Here is how it performs vs other methods.
+The current algorithm is inspired by [seqan's](https://github.com/seqan/seqan/blob/master/include/seqan/translation/translation_tables.h) implementation which uses array indexing. Here is how it performs vs other methods (tested on 2012 macbook pro).
 
+| Method | 10 bp* | 100 bp | 1,000 bp | 10,000 bp | 100,000 bp | 1 million bp |
+| ------ | ---- | ----- | ------- | -------- | --------- | ------- |
+| protein_translate | **91 ns** | **0.29 μs** | **2.28 μs** | **23 μs** | **215 μs** | **2.25 ms** |
+| fnv hashmap | 111 ns | 0.37 μs | 3.58 μs | 37 μs | 366 us | 3.86 ms |
+| std hashmap | 160 ns | 1.03 μs | 9.65 μs | 100 μs | 943 μs | 9.40 ms |
+| phf_map | 177 ns | 1.04 μs | 9.47 μs | 100 μs | 936 μs | 9.91 |
+| match statement | 259 ns | 1.77 μs | 17.9 μs | 163 μs | 1941 μs | 19.1 ms |
+| protein_translate (unchecked) | 90 ns | 0.26 μs | 2.02 μs | 20 μs | 197 μs | 1.92 ms |
 
-| Method | 10 bp* | 100 bp | 1,000 bp | 10,000 bp | 100,000 bp |
-| ------ | ---- | ----- | ------- | -------- | --------- |
-| protein_translate | **87 ns** | **0.22 μs** | **1.74 μs** | **15 μs** | **157 μs** |
-| fnv hashmap | 251 ns | 1.04 μs | 3.41 μs | 35 μs | 361 us
-| std hashmap | 159 ns | 1.02 μs | 9.69 μs | 100 μs | 966 μs |
-| phf_map | 190 ns | 1.13 μs | 10.56 μs | 105 μs | 1021 μs |
-| match statement | 270 ns | 1.74 μs | 18.4 μs | 173 μs | 1907 μs |
-
-> *bp = "base pairs"
+> *bp = "base pairs"  
 
 To benchmark yourself (have to use nightly because of phf_map macro).
 
@@ -53,7 +53,11 @@ To benchmark yourself (have to use nightly because of phf_map macro).
 cargo +nightly bench
 ```
 
-If you have a better implementation feel free to submit a merge request!
+### Thoughts
+
+* [FNV](https://github.com/servo/rust-fnv) seems to be a great option, but I have chosen to use the current implementation due to being slightly faster and not required any dependencies.
+* There is hardly any benefit to using `translate_unchecked`.
+* There was originally a function called `translate_unchecked` that did not validate each byte for valid ASCII, but since the performance gain was negligible, it was removed
 
 ## Todo
 * Add other Codon tables (e.g. Vertebrate Mitochondrial, Yeast Mitochondrial, Mold Mitochondrial, etc.)

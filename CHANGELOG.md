@@ -2,6 +2,13 @@
 
 History of changes for each new version
 
+## 0.2.0 - 2019-08-10
+
+- Functions now accept bytes instead of string slice
+- Added checking to `translate` function
+- Added `translate_unchecked`
+- Updated benchmarks
+
 ## 0.1.2 - 2019-08-08
 
 - Translate function now uses `chunks_exact`

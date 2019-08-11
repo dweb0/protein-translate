@@ -10,7 +10,7 @@ fn validate() {
     
     for record in rdr.deserialize() {
         let (seq, peptide): (String, String) = record.unwrap();
-        let my_peptide = translate(&seq);
+        let my_peptide = translate(seq.as_bytes());
         assert_eq!(peptide, my_peptide);
     }
 }

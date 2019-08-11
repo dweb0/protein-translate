@@ -120,10 +120,10 @@ mod using_hashmap {
         };
     }
 
-    pub fn translate(seq: &str) -> String {
+    pub fn translate(seq: &[u8]) -> String {
 
         let mut peptide = String::with_capacity(seq.len() / 3);
-        for chunk in seq.as_bytes().chunks_exact(3) {
+        for chunk in seq.chunks_exact(3) {
             let amino_acid = AA_TABLE.get(chunk).unwrap_or(&'X');
             peptide.push(*amino_acid);
         }
@@ -137,7 +137,7 @@ mod using_fnv {
 
     lazy_static! {
         static ref AA_TABLE: FnvHashMap<&'static [u8], char> = {
-            let mut m: FnvHashMap<&'static [u8], char> = FnvHashMap::default();
+            let mut m: FnvHashMap<&'static [u8], char> = FnvHashMap::with_capacity_and_hasher(101, Default::default());
             m.insert(b"TAA", '*');
             m.insert(b"TAG", '*');
             m.insert(b"TGA", '*');
@@ -243,10 +243,10 @@ mod using_fnv {
         };
     }
 
-    pub fn translate(seq: &str) -> String {
+    pub fn translate(seq: &[u8]) -> String {
 
         let mut peptide = String::with_capacity(seq.len() / 3);
-        for chunk in seq.as_bytes().chunks_exact(3) {
+        for chunk in seq.chunks_exact(3) {
             let amino_acid = AA_TABLE.get(chunk).unwrap_or(&'X');
             peptide.push(*amino_acid);
         }
@@ -284,10 +284,10 @@ mod using_match {
         }
     }
 
-    pub fn translate(seq: &str) -> String {
+    pub fn translate(seq: &[u8]) -> String {
 
         let mut peptide = String::with_capacity(seq.len() / 3);
-        for chunk in seq.as_bytes().chunks_exact(3) {
+        for chunk in seq.chunks_exact(3) {
             let amino_acid = triplet_to_char(chunk);
             peptide.push(amino_acid);
         }
@@ -404,9 +404,9 @@ mod using_phf_map {
     };
 
 
-    pub fn translate(seq: &str) -> String {
+    pub fn translate(seq: &[u8]) -> String {
         let mut peptide = String::with_capacity(seq.len() / 3);
-        for chunk in seq.as_bytes().chunks_exact(3) {
+        for chunk in seq.chunks_exact(3) {
             let amino_acid = AA_TABLE.get(chunk).unwrap_or(&'X');
             peptide.push(*amino_acid);
         }
@@ -416,9 +416,9 @@ mod using_phf_map {
 
 
 // 100,000 base pair sequence
-static TEST_SEQ: &'static str = include_str!("test_seq.txt");
+static TEST_SEQ: &'static [u8] = include_bytes!("test_seq.txt");
 
-fn bench_current(c: &mut Criterion) {
+fn bench_checked(c: &mut Criterion) {
 
     c.bench_function("current implementation", |b| {
         b.iter(|| protein_translate::translate(black_box(TEST_SEQ)))
@@ -433,7 +433,7 @@ fn bench_hashmap(c: &mut Criterion) {
 
 fn bench_fnv(c: &mut Criterion) {
     c.bench_function("fnv hashmap", |b| {
-        b.iter(|| using_fnv::translate(black_box(&TEST_SEQ)))
+        b.iter(|| using_fnv::translate(black_box(TEST_SEQ)))
     });
 }
 
@@ -451,10 +451,10 @@ fn bench_phf_map(c: &mut Criterion) {
 
 criterion_group!(
     benches,
-    // bench_current,
-    // bench_hashmap,
+    bench_checked,
+    bench_hashmap,
     bench_fnv,
-    // bench_match,
-    // bench_phf_map
+    bench_match,
+    bench_phf_map
 );
 criterion_main!(benches);
